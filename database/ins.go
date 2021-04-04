@@ -12,6 +12,12 @@ type DB struct {
 	client *sql.DB
 }
 
+type account struct {
+	id       int64
+	account  string
+	password string
+}
+
 func Init_db() *DB {
 	db, err := sql.Open("mysql", "mysql:mysql@/datadb")
 	if err != nil {
@@ -26,18 +32,26 @@ func Init_db() *DB {
 	}
 }
 
-func (db *DB) InsertAccount(accNam string, ) (int64, error) {
+func (db *DB) InsertAccount(accNam string, password string) (int64, error) {
 	stmt, e := db.client.Prepare("insert into data(id, account, password) values (?, ?, ?)")
-	SELECT * FROM permlog WHERE max(id)
+	if e != nil {
+		return -1, e
+	}
+	rows, e := db.client.Query("SELECT * FROM data WHERE max(id)")
+	if e != nil {
+		return -1, e
+	}
+	rows.Next()
+	var maxInt int64
+	rows.Scan(&maxInt)
+
+	//execute
+	res, e := stmt.Exec(maxInt, accNam, password)
+
 	if e != nil {
 		return -1, e
 	}
 
-	//execute
-	res, e := stmt.Exec("5", "Post five", "Contents of post 5")
-	if e != nil {
-		return -1, e
-	}
 	id, e := res.LastInsertId()
 	if e != nil {
 		return -1, e
@@ -47,5 +61,6 @@ func (db *DB) InsertAccount(accNam string, ) (int64, error) {
 }
 
 func (db *DB) RemoveAccount(accNam string) (int64, error) {
+	stmt, e := db.client.Prepare("insert into data(id, account, password) values (?, ?, ?)")
 	return 0, nil
 }
