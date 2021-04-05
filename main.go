@@ -68,7 +68,14 @@ func main() {
 			fmt.Println(id)
 			break
 		case 3:
-			a := sec.GenPassword()
+			fmt.Println("password length ")
+			text, err = reader.ReadString('\n')
+			text := strings.Replace(text, "\n", "", -1)
+			num, err := strconv.ParseInt(text, 10, 64)
+			if err != nil {
+				fmt.Println(err)
+			}
+			a := sec.GenPassword(uint8(num))
 			println(a)
 			break
 		default:
