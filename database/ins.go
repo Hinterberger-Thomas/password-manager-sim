@@ -23,7 +23,6 @@ func Init_db() *DB {
 	if err != nil {
 		fmt.Println(err)
 	}
-	// See "Important settings" section.
 	db.SetConnMaxLifetime(time.Minute * 3)
 	db.SetMaxOpenConns(10)
 	db.SetMaxIdleConns(10)
@@ -45,7 +44,6 @@ func (db *DB) InsertAccount(accNam string, password string) (int64, error) {
 	var maxInt int64
 	rows.Scan(&maxInt)
 
-	//execute
 	res, err := stmt.Exec(maxInt+1, accNam, password)
 
 	if err != nil {
