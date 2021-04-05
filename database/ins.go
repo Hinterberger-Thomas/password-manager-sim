@@ -37,7 +37,7 @@ func (db *DB) InsertAccount(accNam string, password string) (int64, error) {
 	if err != nil {
 		return -1, err
 	}
-	rows, err := db.client.Query("SELECT * FROM data WHERE max(id);")
+	rows, err := db.client.Query("SELECT max(id) FROM data;")
 	if err != nil {
 		return -1, err
 	}
@@ -46,7 +46,7 @@ func (db *DB) InsertAccount(accNam string, password string) (int64, error) {
 	rows.Scan(&maxInt)
 
 	//execute
-	res, err := stmt.Exec(maxInt, accNam, password)
+	res, err := stmt.Exec(maxInt+1, accNam, password)
 
 	if err != nil {
 		return -1, err
