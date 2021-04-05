@@ -13,9 +13,9 @@ type DB struct {
 }
 
 type Account struct {
-	id       int64
-	account  string
-	password string
+	Id       int64
+	Account  string
+	Password string
 }
 
 func Init_db() *DB {
@@ -77,7 +77,7 @@ func (db *DB) GetAccount(id int64) (Account, error) {
 
 	}
 	res.Next()
-	res.Scan(&acc.id, &acc.account, &acc.password)
+	res.Scan(&acc.Id, &acc.Account, &acc.Password)
 	if e != nil {
 		fmt.Println("sus")
 		return Account{}, e

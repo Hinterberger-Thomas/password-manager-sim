@@ -43,6 +43,11 @@ func main() {
 				fmt.Println(err)
 			}
 			acc, err := db.GetAccount(num)
+			fmt.Println("pls enter key ")
+			keyUn, err := reader.ReadString('\n')
+			keyUnW := strings.Replace(keyUn, "\n", "", -1)
+			key := []byte(keyUnW)
+			acc.Password = sec.Decrypt(key, acc.Password)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -56,12 +61,23 @@ func main() {
 			}
 			accNam := strings.Replace(text, "\n", "", -1)
 			fmt.Println("pls enter account password ")
-			text, err = reader.ReadString('\n')
+			passwordUn, err := reader.ReadString('\n')
+
 			if err != nil {
 				log.Fatal(err)
 			}
-			password := strings.Replace(text, "\n", "", -1)
-			id, err := db.InsertAccount(accNam, password)
+			fmt.Println("pls enter key ")
+			keyUn, err := reader.ReadString('\n')
+			keyUnW := strings.Replace(keyUn, "\n", "", -1)
+			passwordUnW := strings.Replace(passwordUn, "\n", "", -1)
+			key := []byte(keyUnW)
+			cryptoText := sec.Encrypt(key, passwordUnW)
+
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			id, err := db.InsertAccount(accNam, cryptoText)
 			if err != nil {
 				fmt.Println(err)
 			}
