@@ -12,14 +12,14 @@ type DB struct {
 	client *sql.DB
 }
 
-type account struct {
+type Account struct {
 	id       int64
 	account  string
 	password string
 }
 
 func Init_db() *DB {
-	db, err := sql.Open("mysql", "mysql:mysql@/datadb")
+	db, err := sql.Open("mysql", "root:mysql@tcp(127.0.0.1:3306)/datadb")
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -33,34 +33,66 @@ func Init_db() *DB {
 }
 
 func (db *DB) InsertAccount(accNam string, password string) (int64, error) {
-	stmt, e := db.client.Prepare("insert into data(id, account, password) values (?, ?, ?)")
-	if e != nil {
-		return -1, e
+	stmt, err := db.client.Prepare("INSERT INTO data(id, Account, password) VALUES (?, ?, ?);")
+	if err != nil {
+		return -1, err
 	}
-	rows, e := db.client.Query("SELECT * FROM data WHERE max(id)")
-	if e != nil {
-		return -1, e
+	rows, err := db.client.Query("SELECT * FROM data WHERE max(id);")
+	if err != nil {
+		return -1, err
 	}
 	rows.Next()
 	var maxInt int64
 	rows.Scan(&maxInt)
 
 	//execute
-	res, e := stmt.Exec(maxInt, accNam, password)
+	res, err := stmt.Exec(maxInt, accNam, password)
 
-	if e != nil {
-		return -1, e
+	if err != nil {
+		return -1, err
 	}
 
-	id, e := res.LastInsertId()
-	if e != nil {
-		return -1, e
+	id, err := res.LastInsertId()
+	if err != nil {
+		return -1, err
 	}
 
 	return id, nil
 }
 
-func (db *DB) RemoveAccount(accNam string) (int64, error) {
-	stmt, e := db.client.Prepare("insert into data(id, account, password) values (?, ?, ?)")
-	return 0, nil
+func (db *DB) GetAccount(id int64) (Account, error) {
+	res, e := db.client.Query("SELECT id, Account, password FROM data WHERE id = ?;", id)
+	var acc Account
+	if e != nil {
+		err := db.createTable()
+		if err != nil {
+			return acc, err
+		}
+		fmt.Println(e)
+		fmt.Println("we just created a new one just for you my little friend")
+		res, e = db.client.Query("SELECT id, Account, password FROM data WHERE id = ?;", id)
+		if e != nil {
+			fmt.Println(e)
+		}
+
+	}
+	res.Next()
+	res.Scan(&acc.id, &acc.account, &acc.password)
+	if e != nil {
+		fmt.Println("sus")
+		return Account{}, e
+	}
+	return acc, nil
+}
+
+func (db *DB) createTable() error {
+	const sqlCreateTable = "CREATE TABLE data (id int,Account varchar(255),password varchar(255));"
+	const sqlInsIntTab = "INSERT INTO data(id, Account, password) VALUES (0, start, 1234);"
+
+	_, err := db.client.Exec(sqlCreateTable)
+	if err != nil {
+		return err
+	}
+	_, err = db.client.Query(sqlInsIntTab)
+	return err
 }
