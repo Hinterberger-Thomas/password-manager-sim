@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Hinterberger-Thomas/password-manager-sim/database"
-	"github.com/Hinterberger-Thomas/password-manager-sim/sec"
+	"github.com/Hinterberger-Thomas/password-manager-sim/src/database"
+	"github.com/Hinterberger-Thomas/password-manager-sim/src/sec"
 )
 
 func main() {
@@ -43,6 +43,9 @@ func main() {
 				fmt.Println(err)
 			}
 			acc, err := db.GetAccount(num)
+			if err != nil {
+				fmt.Println(err)
+			}
 			fmt.Println("pls enter key ")
 			keyUn, err := reader.ReadString('\n')
 			keyUnW := strings.Replace(keyUn, "\n", "", -1)
@@ -86,6 +89,9 @@ func main() {
 		case 3:
 			fmt.Println("password length ")
 			text, err = reader.ReadString('\n')
+			if err != nil {
+				fmt.Println(err)
+			}
 			text := strings.Replace(text, "\n", "", -1)
 			num, err := strconv.ParseInt(text, 10, 64)
 			if err != nil {
