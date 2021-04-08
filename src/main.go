@@ -12,30 +12,15 @@ import (
 	"github.com/Hinterberger-Thomas/password-manager-sim/src/sec"
 )
 
+var reader *bufio.Reader = bufio.NewReader(os.Stdin)
+var db *database.DB = database.InitDB()
+
 func main() {
-	db := database.Init_db()
-	/*var db *database.DB
 	for true {
-		fmt.Println("Enter password for your account pls")
-
-		reader := bufio.NewReader(os.Stdin)
-		pass, err := reader.ReadString('\n')
-		if err != nil {
-			fmt.Println(err)
-		}
-		pass = strings.Replace(pass, "\n", "", -1)
-
-		_, err = db.GetAccount(0)
-		if err == nil {
-			break
-		}
-	}*/
-	for true {
-
 		fmt.Println("1.) Get Account")
 		fmt.Println("2.) Insert Account")
 		fmt.Println("3.) Generate Password")
-		reader := bufio.NewReader(os.Stdin)
+
 		text, err := reader.ReadString('\n')
 		text = strings.Replace(text, "\n", "", -1)
 		if err != nil {
@@ -47,68 +32,92 @@ func main() {
 		}
 		switch num {
 		case 1:
-			listAcc, err := db.GetAllAccount()
-			if err != nil {
-				fmt.Println(err)
-			}
-			for e := listAcc.Front(); e != nil; e = e.Next() {
-				fmt.Println(e.Value)
-			}
+			getAccCase()
 			break
 		case 2:
-			fmt.Println("pls enter id name")
-			id, err := reader.ReadString('\n')
-			id = strings.Replace(text, "\n", "", -1)
-			if err != nil {
-				fmt.Println(err)
-			}
-			idNum, err := strconv.ParseInt(id, 10, 64)
-			if err != nil {
-				fmt.Println("no number")
-				return
-			}
-			if a, err := db.GetAccountFile(idNum); a != "" {
-				if err != nil {
-					fmt.Println(err)
-				}
-
-				return
-			}
-			fmt.Println("pls enter account name ")
-			text, err = reader.ReadString('\n')
-			if err != nil {
-				log.Fatal(err)
-			}
-			accNam := strings.Replace(text, "\n", "", -1)
-			fmt.Println("pls enter account password ")
-			passwordUn, err := reader.ReadString('\n')
-
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			idInserted, err := db.InsertAccount(accNam, passwordUn)
-			if err != nil {
-				fmt.Println(err)
-			}
-			fmt.Println(idInserted)
+			getAccCase()
 			break
 		case 3:
-			fmt.Println("password length ")
-			text, err = reader.ReadString('\n')
-			if err != nil {
-				fmt.Println(err)
-			}
-			text := strings.Replace(text, "\n", "", -1)
-			num, err := strconv.ParseInt(text, 10, 64)
-			if err != nil {
-				fmt.Println(err)
-			}
-			a := sec.GenPassword(uint8(num))
-			println(a)
+			genPassCase()
 			break
 		default:
 			return
 		}
 	}
+}
+
+func getAccCase() {
+	res, err := db.GetAllAccounts()
+
+	if err != nil {
+		fmt.Println(err)
+	}
+	var acc database.Account
+	var listOfAcc []database.Account
+	for res.Next() {
+		res.Scan(&acc.Id, &acc.Account, &acc.Password)
+		listOfAcc = append(listOfAcc, acc)
+	}
+	fmt.Println(listOfAcc)
+
+}
+
+func insAccCase() {
+	fmt.Println("pls enter id name")
+	id, err := reader.ReadString('\n')
+	id = strings.Replace(id, "\n", "", -1)
+	if err != nil {
+		fmt.Println(err)
+	}
+	idNum, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		fmt.Println("no number")
+		return
+	}
+	if res, err := db.GetAccountFile(idNum); res != "" {
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		insAccIntoDB(database.JSONToList(res))
+	}
+	var empByarr []database.Account
+	insAccIntoDB(empByarr)
+
+}
+
+func insAccIntoDB(acc []database.Account) {
+	fmt.Println("pls enter account name ")
+	text, err := reader.ReadString('\n')
+	if err != nil {
+		log.Fatal(err)
+	}
+	accNam := strings.Replace(text, "\n", "", -1)
+	fmt.Println("pls enter account password ")
+	passwordUn, err := reader.ReadString('\n')
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	idInserted, err := db.InsertAccount(accNam, passwordUn)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(idInserted)
+}
+
+func genPassCase() {
+	fmt.Println("password length ")
+	text, err := reader.ReadString('\n')
+	if err != nil {
+		fmt.Println(err)
+	}
+	text = strings.Replace(text, "\n", "", -1)
+	num, err := strconv.ParseInt(text, 10, 64)
+	if err != nil {
+		fmt.Println(err)
+	}
+	a := sec.GenPassword(uint8(num))
+	println(a)
 }

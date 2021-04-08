@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-func jsonToList(jsonOb string) []Account {
+func JSONToList(jsonOb string) []Account {
 
 	var acc []Account
 
@@ -13,7 +13,7 @@ func jsonToList(jsonOb string) []Account {
 
 	return acc
 }
-func ListToJson(jsonOb []Account) []byte {
+func ListToJSON(jsonOb []Account) []byte {
 	appsJSON, err := json.Marshal(jsonOb)
 
 	if err != nil {

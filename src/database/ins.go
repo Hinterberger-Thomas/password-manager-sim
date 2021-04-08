@@ -1,7 +1,6 @@
 package database
 
 import (
-	"container/list"
 	"database/sql"
 	"fmt"
 	"time"
@@ -19,7 +18,7 @@ type Account struct {
 	Password string
 }
 
-func Init_db( /*password string*/ ) *DB {
+func InitDB( /*password string*/ ) *DB {
 	db, err := sql.Open("mysql", "root:mysql@tcp(127.0.0.1:3306)/datadb")
 	if err != nil {
 		fmt.Println(err)
@@ -59,9 +58,8 @@ func (db *DB) InsertAccount(accNam string, file string) (int64, error) {
 	return id, nil
 }
 
-func (db *DB) GetAllAccounts() (*list.List, error) {
+func (db *DB) GetAllAccounts() (*sql.Rows, error) {
 	res, e := db.client.Query("SELECT id, Account, file FROM data;")
-	var acc Account
 	if e != nil {
 		err := db.createTable()
 		if err != nil {
@@ -75,15 +73,8 @@ func (db *DB) GetAllAccounts() (*list.List, error) {
 		}
 
 	}
-	listOfAcc := list.New()
-	for res.Next() {
-		res.Scan(&acc.Id, &acc.Account, &acc.Password)
-		listOfAcc.PushBack(acc)
-	}
-	if e != nil {
-		return nil, e
-	}
-	return listOfAcc, nil
+	return res, nil
+
 }
 
 func (db *DB) createTable() error {
@@ -110,4 +101,12 @@ func (db *DB) GetAccountFile(id int64) (string, error) {
 	stmt.Next()
 	stmt.Scan(&file)
 	return file, nil
+}
+
+func (db *DB) UpdDBFile(id int64, JSON []byte) error {
+	_, err := db.client.Query("UPDATE data SET file = ? WHERE id = ?", id, JSON)
+	if err != nil {
+		return err
+	}
+	return nil
 }
