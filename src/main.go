@@ -47,15 +47,33 @@ func main() {
 		}
 		switch num {
 		case 1:
-			listAcc, err := db.GetAccount()
+			listAcc, err := db.GetAllAccount()
 			if err != nil {
 				fmt.Println(err)
 			}
 			for e := listAcc.Front(); e != nil; e = e.Next() {
-				fmt.Println(e)
+				fmt.Println(e.Value)
 			}
 			break
 		case 2:
+			fmt.Println("pls enter id name")
+			id, err := reader.ReadString('\n')
+			id = strings.Replace(text, "\n", "", -1)
+			if err != nil {
+				fmt.Println(err)
+			}
+			idNum, err := strconv.ParseInt(id, 10, 64)
+			if err != nil {
+				fmt.Println("no number")
+				return
+			}
+			if a, err := db.GetAccountFile(idNum); a != "" {
+				if err != nil {
+					fmt.Println(err)
+				}
+
+				return
+			}
 			fmt.Println("pls enter account name ")
 			text, err = reader.ReadString('\n')
 			if err != nil {
@@ -68,22 +86,12 @@ func main() {
 			if err != nil {
 				log.Fatal(err)
 			}
-			fmt.Println("pls enter key ")
-			keyUn, err := reader.ReadString('\n')
-			keyUnW := strings.Replace(keyUn, "\n", "", -1)
-			passwordUnW := strings.Replace(passwordUn, "\n", "", -1)
-			key := []byte(keyUnW)
-			cryptoText := sec.Encrypt(key, passwordUnW)
 
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			id, err := db.InsertAccount(accNam, cryptoText)
+			idInserted, err := db.InsertAccount(accNam, passwordUn)
 			if err != nil {
 				fmt.Println(err)
 			}
-			fmt.Println(id)
+			fmt.Println(idInserted)
 			break
 		case 3:
 			fmt.Println("password length ")
