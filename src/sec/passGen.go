@@ -3,6 +3,7 @@ package sec
 import (
 	"math/rand"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -18,7 +19,7 @@ func GenPassword(passlen uint8) string {
 func getPassData(num int) string {
 	pass := ""
 	if num <= 10 {
-		pass = strconv.Itoa(num)
+		return strconv.Itoa(num)
 	}
 	switch num {
 	case 11:
@@ -74,5 +75,9 @@ func getPassData(num int) string {
 	case 36:
 		pass = "Z"
 	}
+	if rand.Intn(2) == 1 {
+		return strings.ToLower(pass)
+	}
+
 	return pass
 }
