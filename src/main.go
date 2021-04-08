@@ -13,7 +13,8 @@ import (
 )
 
 func main() {
-	var db *database.DB
+	db := database.Init_db()
+	/*var db *database.DB
 	for true {
 		fmt.Println("Enter password for your account pls")
 
@@ -23,12 +24,12 @@ func main() {
 			fmt.Println(err)
 		}
 		pass = strings.Replace(pass, "\n", "", -1)
-		db = database.Init_db(pass)
+
 		_, err = db.GetAccount(0)
 		if err == nil {
 			break
 		}
-	}
+	}*/
 	for true {
 
 		fmt.Println("1.) Get Account")
@@ -46,29 +47,13 @@ func main() {
 		}
 		switch num {
 		case 1:
-			fmt.Println("pls enter id")
-			text, err = reader.ReadString('\n')
+			listAcc, err := db.GetAccount()
 			if err != nil {
 				fmt.Println(err)
 			}
-			text = strings.Replace(text, "\n", "", -1)
-			num, err = strconv.ParseInt(text, 10, 64)
-			if err != nil {
-				fmt.Println(err)
+			for e := listAcc.Front(); e != nil; e = e.Next() {
+				fmt.Println(e)
 			}
-			acc, err := db.GetAccount(num)
-			if err != nil {
-				fmt.Println(err)
-			}
-			fmt.Println("pls enter key ")
-			keyUn, err := reader.ReadString('\n')
-			keyUnW := strings.Replace(keyUn, "\n", "", -1)
-			key := []byte(keyUnW)
-			acc.Password = sec.Decrypt(key, acc.Password)
-			if err != nil {
-				log.Fatal(err)
-			}
-			fmt.Println(acc)
 			break
 		case 2:
 			fmt.Println("pls enter account name ")

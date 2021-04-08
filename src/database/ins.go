@@ -1,6 +1,7 @@
 package database
 
 import (
+	"container/list"
 	"database/sql"
 	"fmt"
 	"time"
@@ -18,8 +19,8 @@ type Account struct {
 	Password string
 }
 
-func Init_db(password string) *DB {
-	db, err := sql.Open("mysql", "root:"+password+"@tcp(127.0.0.1:3306)/datadb")
+func Init_db( /*password string*/ ) *DB {
+	db, err := sql.Open("mysql", "root:mysql@tcp(127.0.0.1:3306)/datadb")
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -58,29 +59,31 @@ func (db *DB) InsertAccount(accNam string, password string) (int64, error) {
 	return id, nil
 }
 
-func (db *DB) GetAccount(id int64) (Account, error) {
-	res, e := db.client.Query("SELECT id, Account, password FROM data WHERE id = ?;", id)
+func (db *DB) GetAccount() (*list.List, error) {
+	res, e := db.client.Query("SELECT id, Account, password FROM data;")
 	var acc Account
 	if e != nil {
 		err := db.createTable()
 		if err != nil {
-			return acc, err
+			return nil, err
 		}
 		fmt.Println(e)
 		fmt.Println("we just created a new one just for you my little friend")
-		res, e = db.client.Query("SELECT id, Account, password FROM data WHERE id = ?;", id)
+		res, e = db.client.Query("SELECT id, Account, password FROM data;")
 		if e != nil {
 			fmt.Println(e)
 		}
 
 	}
-	res.Next()
-	res.Scan(&acc.Id, &acc.Account, &acc.Password)
-	if e != nil {
-		fmt.Println("sus")
-		return Account{}, e
+	listOfAcc := list.New()
+	for res.Next() {
+		res.Scan(&acc.Id, &acc.Account, &acc.Password)
+		listOfAcc.PushBack(acc)
 	}
-	return acc, nil
+	if e != nil {
+		return nil, e
+	}
+	return listOfAcc, nil
 }
 
 func (db *DB) createTable() error {
