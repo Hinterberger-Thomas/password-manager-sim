@@ -18,8 +18,8 @@ type Account struct {
 	Password string
 }
 
-func Init_db() *DB {
-	db, err := sql.Open("mysql", "root:mysql@tcp(127.0.0.1:3306)/datadb")
+func Init_db(password string) *DB {
+	db, err := sql.Open("mysql", "root:"+password+"@tcp(127.0.0.1:3306)/datadb")
 	if err != nil {
 		fmt.Println(err)
 	}

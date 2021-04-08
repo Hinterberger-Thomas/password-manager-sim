@@ -13,8 +13,22 @@ import (
 )
 
 func main() {
+	var db *database.DB
+	for true {
+		fmt.Println("Enter password for your account pls")
 
-	db := database.Init_db()
+		reader := bufio.NewReader(os.Stdin)
+		pass, err := reader.ReadString('\n')
+		if err != nil {
+			fmt.Println(err)
+		}
+		pass = strings.Replace(pass, "\n", "", -1)
+		db = database.Init_db(pass)
+		_, err = db.GetAccount(0)
+		if err == nil {
+			break
+		}
+	}
 	for true {
 
 		fmt.Println("1.) Get Account")
