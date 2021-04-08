@@ -32,8 +32,8 @@ func Init_db( /*password string*/ ) *DB {
 	}
 }
 
-func (db *DB) InsertAccount(accNam string, password string) (int64, error) {
-	stmt, err := db.client.Prepare("INSERT INTO data(id, Account, password) VALUES (?, ?, ?);")
+func (db *DB) InsertAccount(accNam string, file string) (int64, error) {
+	stmt, err := db.client.Prepare("INSERT INTO data(id, Account, file) VALUES (?, ?, ?);")
 	if err != nil {
 		return -1, err
 	}
@@ -45,7 +45,7 @@ func (db *DB) InsertAccount(accNam string, password string) (int64, error) {
 	var maxInt int64
 	rows.Scan(&maxInt)
 
-	res, err := stmt.Exec(maxInt+1, accNam, password)
+	res, err := stmt.Exec(maxInt+1, accNam, file)
 
 	if err != nil {
 		return -1, err
@@ -59,8 +59,8 @@ func (db *DB) InsertAccount(accNam string, password string) (int64, error) {
 	return id, nil
 }
 
-func (db *DB) GetAccount() (*list.List, error) {
-	res, e := db.client.Query("SELECT id, Account, password FROM data;")
+func (db *DB) GetAllAccounts() (*list.List, error) {
+	res, e := db.client.Query("SELECT id, Account, file FROM data;")
 	var acc Account
 	if e != nil {
 		err := db.createTable()
@@ -69,7 +69,7 @@ func (db *DB) GetAccount() (*list.List, error) {
 		}
 		fmt.Println(e)
 		fmt.Println("we just created a new one just for you my little friend")
-		res, e = db.client.Query("SELECT id, Account, password FROM data;")
+		res, e = db.client.Query("SELECT id, Account, file FROM data;")
 		if e != nil {
 			fmt.Println(e)
 		}
@@ -87,8 +87,8 @@ func (db *DB) GetAccount() (*list.List, error) {
 }
 
 func (db *DB) createTable() error {
-	const sqlCreateTable = "CREATE TABLE data (id int,Account varchar(255),password varchar(255));"
-	const sqlInsIntTab = "INSERT INTO data(id, Account, password) VALUES (0, start, 1234);"
+	const sqlCreateTable = "CREATE TABLE data (id int PRIMARY KEY,Account varchar(255),file blob);"
+	const sqlInsIntTab = "INSERT INTO data(id, Account, file) VALUES (0, start, utl_raw.cast_to_raw('This is a blob description'));"
 
 	_, err := db.client.Exec(sqlCreateTable)
 	if err != nil {
@@ -96,4 +96,18 @@ func (db *DB) createTable() error {
 	}
 	_, err = db.client.Query(sqlInsIntTab)
 	return err
+}
+
+func (db *DB) GetAccountFile(id int64) (string, error) {
+	stmt, err := db.client.Query("SELECT file FROM data WHERE id = ?;", id)
+	if err != nil {
+		return "", err
+	}
+	if err != nil {
+		return "", err
+	}
+	var file string
+	stmt.Next()
+	stmt.Scan(&file)
+	return file, nil
 }
