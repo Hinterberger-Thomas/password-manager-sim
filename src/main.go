@@ -17,19 +17,7 @@ var db *database.DB = database.InitDB()
 
 func main() {
 	for true {
-		fmt.Println("1.) Get Account")
-		fmt.Println("2.) Insert Account")
-		fmt.Println("3.) Generate Password")
-
-		text, err := reader.ReadString('\n')
-		text = strings.Replace(text, "\n", "", -1)
-		if err != nil {
-			log.Fatal(err)
-		}
-		num, err := strconv.ParseInt(text, 10, 64)
-		if err != nil {
-			log.Fatal(err)
-		}
+		num := mainMenu()
 		switch num {
 		case 1:
 			getAccCase()
@@ -44,6 +32,23 @@ func main() {
 			return
 		}
 	}
+}
+
+func mainMenu() int64 {
+	fmt.Println("1.) Get Account")
+	fmt.Println("2.) Insert Account")
+	fmt.Println("3.) Generate Password")
+
+	text, err := reader.ReadString('\n')
+	text = strings.Replace(text, "\n", "", -1)
+	if err != nil {
+		log.Fatal(err)
+	}
+	num, err := strconv.ParseInt(text, 10, 64)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return num
 }
 
 func getAccCase() {
@@ -119,5 +124,5 @@ func genPassCase() {
 		fmt.Println(err)
 	}
 	a := sec.GenPassword(uint8(num))
-	println(a)
+	fmt.Println(a)
 }
