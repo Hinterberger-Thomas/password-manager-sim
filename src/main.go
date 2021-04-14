@@ -29,6 +29,7 @@ func main() {
 			genPassCase()
 			break
 		default:
+			fmt.Println("see you later alligator")
 			return
 		}
 	}
