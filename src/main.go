@@ -36,7 +36,7 @@ func main() {
 }
 
 func mainMenu() int64 {
-	fmt.Println("1.) Get Account")
+	fmt.Println("1.) Get Account by id")
 	fmt.Println("2.) Insert Account")
 	fmt.Println("3.) Generate Password")
 
