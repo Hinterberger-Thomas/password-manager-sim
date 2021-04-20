@@ -10,6 +10,7 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/gordonklaus/ineffassign v0.0.0-20210225214923-2e10b2664254 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/jgautheron/goconst v1.4.0 // indirect
 	github.com/mdempsky/maligned v0.0.0-20210215075342-f0178ee82032 // indirect
